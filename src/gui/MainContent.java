@@ -4,13 +4,17 @@ import java.awt.*;
 import javax.swing.*;
 
 public class MainContent {
+    private DashboardPanel dashboard;
+
     public MainContent(myFrame frameObject, String studentName, String courseYear, String username) {
         JPanel container = frameObject.getContainer();
-        
-        container.add(new DashboardPanel(studentName, courseYear), "DASHBOARD");
+
+        dashboard = new DashboardPanel(studentName, courseYear);
+
+        container.add(dashboard, "DASHBOARD");
         container.add(new PortfolioPanel(), "PORTFOLIO"); 
         container.add(new SettingsPanel(), "SETTINGS");
-        container.add(new ProfilePanel(frameObject, username), "PROFILE");
+        container.add(new ProfilePanel(frameObject, username, dashboard), "PROFILE");
 
         addWindowControls(frameObject);
     }

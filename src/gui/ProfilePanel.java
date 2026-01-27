@@ -17,8 +17,11 @@ public class ProfilePanel extends JPanel {
     private String selectedImagePath = "";
     private String currentUsername; // Store the username to know WHO to update
 
-    public ProfilePanel(myFrame frameObject, String username) {
+    private DashboardPanel dashRef;
+
+    public ProfilePanel(myFrame frameObject, String username, DashboardPanel dashboard) {
         this.currentUsername = username;
+        this.dashRef = dashboard;
         setLayout(null);
         setBackground(new Color(0x839788));
 
@@ -115,22 +118,26 @@ public class ProfilePanel extends JPanel {
     }
     
     private void saveProfileChanges(myFrame frameObject) {
+        String newName = nameField.getText();
+        String newCourse = courseField.getText();
+
         try (Connection conn = Database.getConnection()) {
             String sql = "UPDATE users SET full_name=?, student_id=?, course_year=?, email=?, bio=? WHERE username=?";
             PreparedStatement pst = conn.prepareStatement(sql);
-            pst.setString(1, nameField.getText());
+            pst.setString(1, newName);
             pst.setString(2, idField.getText());
-            pst.setString(3, courseField.getText());
+            pst.setString(3, newCourse);
             pst.setString(4, emailField.getText());
             pst.setString(5, bioArea.getText());
             pst.setString(6, currentUsername);
 
             int updated = pst.executeUpdate();
             if (updated > 0) {
+                dashRef.refreshDashboardInfo(newName, newCourse);
                 if (!selectedImagePath.isEmpty()) {
                     updateSidebarImage(frameObject, selectedImagePath);
                 }
-                JOptionPane.showMessageDialog(this, "Profile Synced to Database!");
+                JOptionPane.showMessageDialog(this, "Student Profile Synced!");
             }
         } catch (Exception e) {
             e.printStackTrace();

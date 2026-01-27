@@ -4,19 +4,22 @@ import java.awt.*;
 import javax.swing.*;
 
 public class DashboardPanel extends JPanel {
+    private JLabel welcomeUser;
+    private JLabel welcomeCourse;
+
     public DashboardPanel(String studentName, String courseYear) {
         setLayout(null);
         setBackground(new Color(0x839788));
 
-        JLabel welcomeUser = new JLabel("Welcome back, " + studentName + "!");
+        welcomeUser = new JLabel("Welcome back, " + studentName + "!");
         welcomeUser.setBounds(40, 60, 400, 30);
         welcomeUser.setFont(new Font("Helvetica", Font.PLAIN, 18));
         welcomeUser.setForeground(new Color(0xf5e4d7));
         add(welcomeUser);
 
-        JLabel welcomeCourse = new JLabel("Course Year: " + courseYear);
-        welcomeCourse.setBounds(300, 60, 400, 30);
-        welcomeCourse.setFont(new Font("Helvetica", Font.PLAIN, 18));
+        welcomeCourse = new JLabel(courseYear != null ? courseYear : "No Course Set");
+        welcomeCourse.setBounds(40, 90, 400, 20);
+        welcomeCourse.setFont(new Font("Helvetica", Font.ITALIC, 14));
         welcomeCourse.setForeground(new Color(0xf5e4d7));
         add(welcomeCourse);
 
@@ -29,6 +32,15 @@ public class DashboardPanel extends JPanel {
         add(createStatCard("Total Projects", "12", 40, 160));
         add(createStatCard("Skills", "8", 260, 160));
         add(createProgressCard("Overall Progress", 75, 40, 280));
+    }
+
+    public void refreshDashboardInfo(String newName, String newCourse) {
+        welcomeUser.setText("Welcome back, " + newName + "!");
+        welcomeCourse.setText(newCourse);
+    }
+
+    public void updateWelcomeMessage(String newName) {
+        welcomeUser.setText("Welcome back, " + newName + "!");
     }
 
     private JPanel createProgressCard(String title, int value, int x, int y) {
