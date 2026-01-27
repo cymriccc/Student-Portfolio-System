@@ -84,6 +84,7 @@ public class LoginForm extends JFrame {
     private void login() {
         String user = txtUsername.getText();
         String pass = new String(txtPassword.getPassword());
+        
 
         try (Connection conn = Database.getConnection()) {
             String sql = "SELECT full_name, course_year FROM users WHERE username=? AND password=?";
@@ -95,13 +96,15 @@ public class LoginForm extends JFrame {
             if (rs.next()) {
                 String name = rs.getString("full_name");
                 String course = rs.getString("course_year");
+                String actualUsername = user;
+                
                 CustomDialog.show(this, "Welcome, " + name + "!");
 
                 
 
                 // Launch the Dashboard System
                 myFrame dashboardFrame = new myFrame();
-                new MainContent(dashboardFrame, name, course);
+                new MainContent(dashboardFrame, name, course, actualUsername);
                 new Menu(dashboardFrame);
                 new frameDisplay(dashboardFrame);
                 this.dispose();

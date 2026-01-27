@@ -1,18 +1,25 @@
 package gui;
 
+import db.Database;
 import java.awt.*;
-import java.awt.event.*;
-import java.io.File; // to handle file selection
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter; // to filter image file types
+import java.awt.event.*; // to handle file selection
+import java.io.File;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import javax.swing.*; // to filter image file types
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class ProfilePanel extends JPanel {
-    private JTextField nameField, courseField, emailField, idField, contactField; // this is added so that the information inputted can be stored and retrieved 
+    private JTextField nameField, courseField, emailField, idField;
+    private JTextArea bioArea; // Changed to class level to access in save method
     private JLabel imageLabel;
-    private String selectedImagePath = ""; // Stores the path of the new photo
+    private String selectedImagePath = "";
+    private String currentUsername; // Store the username to know WHO to update
 
-    public ProfilePanel(myFrame frameObject) {
-        setLayout(null); // absolute positioning
+    public ProfilePanel(myFrame frameObject, String username) {
+        this.currentUsername = username;
+        setLayout(null);
         setBackground(new Color(0x839788));
 
         // HEADER
@@ -22,34 +29,16 @@ public class ProfilePanel extends JPanel {
         title.setForeground(new Color(0xf5e4d7));
         add(title);
 
-        JPanel underline = new JPanel(); // for design purposes
+        JPanel underline = new JPanel();
         underline.setBounds(40, 85, 80, 4);
         underline.setBackground(new Color(0xf5e4d7));
         add(underline);
 
-        // PROFILE IMAGE 
-        JPanel imgShadow = new JPanel(); // shadow effect
-        imgShadow.setBounds(695, 95, 190, 190);
-        imgShadow.setBackground(new Color(0x73877b)); 
-        add(imgShadow);
+        // PROFILE IMAGE UI
+        setupImageUI(frameObject);
 
-        imageLabel = new JLabel("No Photo", SwingConstants.CENTER);
-        imageLabel.setBounds(700, 100, 180, 180);
-        imageLabel.setOpaque(true);
-        imageLabel.setBackground(new Color(0x94a899));
-        imageLabel.setBorder(BorderFactory.createLineBorder(new Color(0xf5e4d7), 2));
-        imageLabel.setForeground(Color.WHITE);
-        add(imageLabel);
-
-        // Change Photo Button
-        JButton uploadBtn = createStyledButton("UPDATE AVATAR", 700, 300, 180, 35);
-        uploadBtn.addActionListener(e -> chooseImage()); // once clicked, open file explorer
-        add(uploadBtn);
-
-        // PERSONAL DETAILS
+        // PERSONAL DETAILS UI
         int x = 40, y = 120, w = 380, h = 35;
-        
-        // Use a decorative card background for inputs
         add(createSectionHeader("Personal Information", x, y));
         
         add(createLabel("Full Name", x, y + 40));
@@ -70,30 +59,52 @@ public class ProfilePanel extends JPanel {
         emailField = createField(x, y + 335, w, h); 
         add(emailField);
 
-        // BIOGRAPHY SECTION
         add(createLabel("Short Bio", x, y + 375));
-        JTextArea bioArea = new JTextArea();
+        bioArea = new JTextArea();
         bioArea.setBounds(x, y + 400, w, 120); 
-        bioArea.setBackground(new Color(0x94a899)); // Coordinated color with TextFields
+        bioArea.setBackground(new Color(0x94a899));
         bioArea.setForeground(Color.WHITE);
-        bioArea.setLineWrap(true); // enable line wrapping
-        bioArea.setWrapStyleWord(true); // enable word wrapping
-        bioArea.setOpaque(true);
-        bioArea.setCaretColor(Color.WHITE);
+        bioArea.setLineWrap(true);
+        bioArea.setWrapStyleWord(true);
         bioArea.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         add(bioArea);
 
         // SUBMIT BUTTON
         JButton saveBtn = createStyledButton("FINALIZE PROFILE", 700, 600, 200, 55);
-        saveBtn.setFont(new Font("Helvetica", Font.BOLD, 14));
-        saveBtn.addActionListener(e -> {
-            if (!selectedImagePath.isEmpty()) {
-                updateSidebarImage(frameObject, selectedImagePath);
-            } 
-            JOptionPane.showMessageDialog(this, "Your student profile has been synced.");
-        });
+        saveBtn.addActionListener(e -> saveProfileChanges(frameObject));
         add(saveBtn);
+
+        // Load existing user data
+        loadUserData();
     }
+
+    private void loadUserData() {
+        System.out.println("Attempting to load data for: " + currentUsername);
+        try (Connection conn = Database.getConnection()) {
+            String sql = "SELECT full_name, student_id, course_year, email, bio FROM users WHERE username = ?";
+            PreparedStatement pst = conn.prepareStatement(sql);
+            pst.setString(1, currentUsername);
+
+            ResultSet rs = pst.executeQuery();
+
+            if (rs.next()) {
+                System.out.println("User found! Setting fields...");
+                nameField.setText(rs.getString("full_name"));
+                idField.setText(rs.getString("student_id"));
+                courseField.setText(rs.getString("course_year"));
+                emailField.setText(rs.getString("email"));
+
+                String bio = rs.getString("bio");
+                bioArea.setText(bio != null ? bio : "");
+            } else {
+                System.out.println("No user found in DB for username: " + currentUsername);
+            }
+        } catch (Exception e) {
+            System.out.println("Error loading profile data: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
     // helper to create section headers
     private JLabel createSectionHeader(String text, int x, int y) {
         JLabel l = new JLabel(text.toUpperCase());
@@ -101,6 +112,49 @@ public class ProfilePanel extends JPanel {
         l.setForeground(Color.WHITE);
         l.setFont(new Font("Helvetica", Font.BOLD, 13));
         return l;
+    }
+    
+    private void saveProfileChanges(myFrame frameObject) {
+        try (Connection conn = Database.getConnection()) {
+            String sql = "UPDATE users SET full_name=?, student_id=?, course_year=?, email=?, bio=? WHERE username=?";
+            PreparedStatement pst = conn.prepareStatement(sql);
+            pst.setString(1, nameField.getText());
+            pst.setString(2, idField.getText());
+            pst.setString(3, courseField.getText());
+            pst.setString(4, emailField.getText());
+            pst.setString(5, bioArea.getText());
+            pst.setString(6, currentUsername);
+
+            int updated = pst.executeUpdate();
+            if (updated > 0) {
+                if (!selectedImagePath.isEmpty()) {
+                    updateSidebarImage(frameObject, selectedImagePath);
+                }
+                JOptionPane.showMessageDialog(this, "Profile Synced to Database!");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error saving profile.");
+        }
+    }
+
+    private void setupImageUI(myFrame frameObject) {
+        JPanel imgShadow = new JPanel();
+        imgShadow.setBounds(695, 95, 190, 190);
+        imgShadow.setBackground(new Color(0x73877b)); 
+        add(imgShadow);
+
+        imageLabel = new JLabel("No Photo", SwingConstants.CENTER);
+        imageLabel.setBounds(700, 100, 180, 180);
+        imageLabel.setOpaque(true);
+        imageLabel.setBackground(new Color(0x94a899));
+        imageLabel.setBorder(BorderFactory.createLineBorder(new Color(0xf5e4d7), 2));
+        imageLabel.setForeground(Color.WHITE);
+        add(imageLabel);
+
+        JButton uploadBtn = createStyledButton("UPDATE AVATAR", 700, 300, 180, 35);
+        uploadBtn.addActionListener(e -> chooseImage());
+        add(uploadBtn);
     }
 
     // to open file explorer once the button is clicked
