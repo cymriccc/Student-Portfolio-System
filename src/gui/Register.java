@@ -7,13 +7,13 @@ import java.sql.PreparedStatement;
 import javax.swing.*;
 
 public class Register extends JFrame {
-    private JTextField txtFullName, txtUsername;
+    private JTextField txtFullName, txtUsername, txtStudentID, txtCourseYear, txtEmail;
     private JPasswordField txtPassword;
     private JButton btnRegister, btnLogin;
 
     public Register() {
         setTitle("Student Portfolio - Sign Up");
-        setSize(600, 600); // Upgraded size
+        setSize(600, 750); // Upgraded size
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(null); // Switching from GridLayout to Absolute
@@ -26,108 +26,107 @@ public class Register extends JFrame {
 
         // --- Title ---
         JLabel title = new JLabel("CREATE ACCOUNT");
-        title.setBounds(centerX, 60, fieldWidth, 50); 
+        title.setBounds(centerX, 40, fieldWidth, 40); 
         title.setFont(new Font("Helvetica", Font.BOLD, 32));
         title.setForeground(new Color(0xf5e4d7));
         title.setHorizontalAlignment(SwingConstants.CENTER);
         add(title);
 
-        // --- Full Name Section ---
-        JLabel lblFull = new JLabel("Full Name");
-        lblFull.setBounds(centerX, 140, 100, 20);
-        lblFull.setForeground(new Color(0xf5e4d7));
-        add(lblFull);
-
-        txtFullName = new JTextField();
-        txtFullName.setBounds(centerX, 165, fieldWidth, 40);
-        txtFullName.setBackground(new Color(0x94a899)); 
-        txtFullName.setForeground(Color.WHITE);
-        txtFullName.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
-        add(txtFullName);
-
-        // --- Username Section ---
-        JLabel lblUser = new JLabel("Username");
-        lblUser.setBounds(centerX, 225, 100, 20);
-        lblUser.setForeground(new Color(0xf5e4d7));
-        add(lblUser);
-
-        txtUsername = new JTextField();
-        txtUsername.setBounds(centerX, 250, fieldWidth, 40);
-        txtUsername.setBackground(new Color(0x94a899)); 
-        txtUsername.setForeground(Color.WHITE);
-        txtUsername.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
-        add(txtUsername);
-
-        // --- Password Section ---
+        // --- Fields ---
+        addLabelAndField("Full Name", 110, txtFullName = new JTextField());
+        addLabelAndField("Student ID", 190, txtStudentID = new JTextField());
+        addLabelAndField("Course & Year", 270, txtCourseYear = new JTextField());
+        addLabelAndField("Email Address", 350, txtEmail = new JTextField());
+        addLabelAndField("Username", 430, txtUsername = new JTextField());
+        
         JLabel lblPass = new JLabel("Password");
-        lblPass.setBounds(centerX, 310, 100, 20);
+        lblPass.setBounds(centerX, 510, 100, 20);
         lblPass.setForeground(new Color(0xf5e4d7));
         add(lblPass);
 
         txtPassword = new JPasswordField();
-        txtPassword.setBounds(centerX, 335, fieldWidth, 40);
+        txtPassword.setBounds(centerX, 535, fieldWidth, 40);
         txtPassword.setBackground(new Color(0x94a899));
         txtPassword.setForeground(Color.WHITE);
-        txtPassword.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
+        txtPassword.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         add(txtPassword);
 
-        // --- Register Button ---
+        // --- Buttons ---
         btnRegister = new JButton("SIGN UP");
-        btnRegister.setBounds(centerX, 410, fieldWidth, 50);
-        btnRegister.setBackground(new Color(0x73877b)); 
+        btnRegister.setBounds(centerX, 600, fieldWidth, 50);
+        btnRegister.setBackground(new Color(0x73877b));
         btnRegister.setForeground(new Color(0xf5e4d7));
-        btnRegister.setFont(new Font("Helvetica", Font.BOLD, 18));
+        btnRegister.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnRegister.setFocusPainted(false);
         btnRegister.setBorderPainted(false);
-        btnRegister.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnRegister.addActionListener(e -> handleRegistration());
         add(btnRegister);
 
-        // --- Back to Login Link ---
         btnLogin = new JButton("Already have an account? Login");
-        btnLogin.setBounds(centerX, 475, fieldWidth, 30);
+        btnLogin.setBounds(centerX, 660, fieldWidth, 30);
         btnLogin.setForeground(new Color(0xf5e4d7));
         btnLogin.setContentAreaFilled(false);
+        btnLogin.setFocusPainted(false);
         btnLogin.setBorderPainted(false);
         btnLogin.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        add(btnLogin);
-
-        // Listeners
-        btnRegister.addActionListener(e -> registerStudent());
         btnLogin.addActionListener(e -> {
             new LoginForm().setVisible(true);
             dispose();
         });
-        
+        add(btnLogin);
+
         addWindowControls();
     }
 
-    private void registerStudent() {
-        String fullName = txtFullName.getText();
-        String username = txtUsername.getText();
-        String password = new String(txtPassword.getPassword());
+    private void addLabelAndField(String labelText, int yPos, JTextField field) {
+        JLabel label = new JLabel(labelText);
+        label.setBounds(100, yPos, 200, 20);
+        label.setForeground(new Color(0xf5e4d7));
+        add(label);
 
-        if(fullName.isEmpty() || username.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "All fields are required");
+        field.setBounds(100, yPos + 25, 400, 40);
+        field.setBackground(new Color(0x94a899));
+        field.setForeground(Color.WHITE);
+        field.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        add(field);
+    }
+
+    private void handleRegistration() {
+        String fullName = txtFullName.getText().trim();
+        String studentID = txtStudentID.getText().trim();
+        String courseYear = txtCourseYear.getText().trim();
+        String email = txtEmail.getText().trim();
+        String user = txtUsername.getText().trim();
+        String pass = new String(txtPassword.getPassword());
+
+        if (fullName.isEmpty() || studentID.isEmpty() || courseYear.isEmpty() || email.isEmpty() || user.isEmpty() || pass.isEmpty()) {
+            CustomDialog.show(this, "Please fill in all required fields!");
             return;
         }
 
-        try {
-            Connection conn = Database.getConnection();
-            String sql = "INSERT INTO users (full_name, username, password) VALUES (?, ?, ?)";
+        if (!email.contains("@")) {
+            CustomDialog.show(this, "Please enter a valid email address!");
+            return;
+        }
+
+        try (Connection conn = Database.getConnection()) {
+            String sql = "INSERT INTO users (full_name, student_id, course_year, email, username, password) VALUES (?, ?, ?, ?, ?, ?)";
             PreparedStatement pst = conn.prepareStatement(sql);
             pst.setString(1, fullName);
-            pst.setString(2, username);
-            pst.setString(3, password);
+            pst.setString(2, studentID);
+            pst.setString(3, courseYear);
+            pst.setString(4, email);
+            pst.setString(5, user);
+            pst.setString(6, pass);
+
             pst.executeUpdate();
-            
-            JOptionPane.showMessageDialog(this, "Registered successfully!");
-            
-            // Auto-switch back to login after successful register
+            CustomDialog.show(this, "Registration Successful!");
             new LoginForm().setVisible(true);
             dispose();
-            
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            CustomDialog.show(this, "Error: " + ex.getMessage());
         }
     }
 

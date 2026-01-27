@@ -68,6 +68,8 @@ public class LoginForm extends JFrame {
         btnRegister.setForeground(new Color(0xf5e4d7));
         btnRegister.setContentAreaFilled(false);
         btnRegister.setBorderPainted(false);
+        btnRegister.setFocusPainted(false);
+        btnRegister.setCursor(new Cursor(Cursor.HAND_CURSOR));
         add(btnRegister);
 
         btnLogin.addActionListener(e -> login());
@@ -84,24 +86,27 @@ public class LoginForm extends JFrame {
         String pass = new String(txtPassword.getPassword());
 
         try (Connection conn = Database.getConnection()) {
-            String sql = "SELECT full_name FROM users WHERE username=? AND password=?";
+            String sql = "SELECT full_name, course_year FROM users WHERE username=? AND password=?";
             PreparedStatement pst = conn.prepareStatement(sql);
             pst.setString(1, user);
             pst.setString(2, pass);
-            ResultSet rs = pst.executeQuery();
 
+            ResultSet rs = pst.executeQuery();
             if (rs.next()) {
                 String name = rs.getString("full_name");
+                String course = rs.getString("course_year");
                 CustomDialog.show(this, "Welcome, " + name + "!");
+
+                
 
                 // Launch the Dashboard System
                 myFrame dashboardFrame = new myFrame();
-                new MainContent(dashboardFrame, name);
+                new MainContent(dashboardFrame, name, course);
                 new Menu(dashboardFrame);
                 new frameDisplay(dashboardFrame);
                 this.dispose();
             } else {
-                JOptionPane.showMessageDialog(this, "Invalid Username or Password");
+                JOptionPane.showMessageDialog(this, "Invalid credentials!");
             }
         } catch (Exception e) {
             e.printStackTrace();

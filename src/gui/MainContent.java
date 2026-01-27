@@ -4,10 +4,10 @@ import java.awt.*;
 import javax.swing.*;
 
 public class MainContent {
-    public MainContent(myFrame frameObject, String studentName) {
+    public MainContent(myFrame frameObject, String studentName, String courseYear) {
         JPanel container = frameObject.getContainer();
         
-        container.add(new DashboardPanel(studentName), "DASHBOARD");
+        container.add(new DashboardPanel(studentName, courseYear), "DASHBOARD");
         container.add(new PortfolioPanel(), "PORTFOLIO"); 
         container.add(new SettingsPanel(), "SETTINGS");
         container.add(new ProfilePanel(frameObject), "PROFILE");

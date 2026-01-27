@@ -4,7 +4,7 @@ import java.awt.*;
 import javax.swing.*;
 
 public class DashboardPanel extends JPanel {
-    public DashboardPanel(String studentName) {
+    public DashboardPanel(String studentName, String courseYear) {
         setLayout(null);
         setBackground(new Color(0x839788));
 
@@ -13,6 +13,12 @@ public class DashboardPanel extends JPanel {
         welcomeUser.setFont(new Font("Helvetica", Font.PLAIN, 18));
         welcomeUser.setForeground(new Color(0xf5e4d7));
         add(welcomeUser);
+
+        JLabel welcomeCourse = new JLabel("Course Year: " + courseYear);
+        welcomeCourse.setBounds(300, 60, 400, 30);
+        welcomeCourse.setFont(new Font("Helvetica", Font.PLAIN, 18));
+        welcomeCourse.setForeground(new Color(0xf5e4d7));
+        add(welcomeCourse);
 
         JLabel welcomeLabel = new JLabel("Dashboard Overview");
         welcomeLabel.setBounds(40, 100, 400, 50);
