@@ -25,6 +25,9 @@ DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` int NOT NULL AUTO_INCREMENT,
   `full_name` varchar(100) NOT NULL,
+  `student_id` varchar(50) DEFAULT NULL,
+  `course_year` varchar(100) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL
   `username` varchar(50) NOT NULL,
   `password` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
