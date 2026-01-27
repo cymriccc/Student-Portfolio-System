@@ -1,0 +1,18 @@
+version: '3.8'
+services:
+  db:
+    image: mysql:8.0
+    container_name: portfolio_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: studentportfolio
+      MYSQL_DATABASE: student_portfolio
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      # IMPORTANT: Replace 'your_file.sql' with the actual name of your SQL file
+      - ./student_portfolio.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+volumes:
+  db_data:

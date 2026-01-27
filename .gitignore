@@ -1,0 +1,7 @@
+*.class
+bin/
+out/
+.settings/
+.classpath
+.project
+.DS_Store
