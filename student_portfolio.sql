@@ -1,27 +1,5 @@
--- MySQL dump 10.13  Distrib 8.0.44, for Win64 (x86_64)
---
--- Host: localhost    Database: student_portfolio
--- ------------------------------------------------------
--- Server version	8.0.44
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!50503 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
---
 -- Table structure for table `users`
---
-
 DROP TABLE IF EXISTS `users`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
   `id` int NOT NULL AUTO_INCREMENT,
   `full_name` varchar(100) NOT NULL,
@@ -30,35 +8,20 @@ CREATE TABLE `users` (
   `email` varchar(100) DEFAULT NULL,
   `username` varchar(50) NOT NULL,
   `password` varchar(100) NOT NULL,
-  'role' varchar(20) DEFAULT 'student',
+  `role` varchar(20) DEFAULT 'student',
+  `bio` TEXT,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
---
 -- Dumping data for table `users`
---
-
+-- Note: Setting 'Administrator' to role 'admin'
 LOCK TABLES `users` WRITE;
 INSERT INTO `users` (`full_name`, `student_id`, `course_year`, `email`, `username`, `password`, `role`) VALUES 
 ('Administrator', '0000-0000', 'N/A', 'admin@nu-baliwag.edu.ph', 'admin', 'admin123', 'admin'),
 ('Jhulzen Guerrero', '2025-0001', 'BSIT-1', 'jhulzen@email.com', 'jhulzen', '102806', 'student'),
-('Kristine Borres', '2025-0002', 'BSIT-1', 'tine@email.com', 'tine', '12345', 'student'),
-('Chelsie Chavez', '2025-0003', 'BSIT-1', 'chels@email.com', 'chels', '1234', 'student'),
-('Aldrich Hilamon', '2025-0004', 'BSIT-1', 'babygirl@email.com', 'babygirl', '1234', 'student'),
-('Carlo Dingle', '2025-1055147', 'BSIT-1', 'carlo@email.com', 'carlo', '123456', 'student');
+('Kristine Borres', '2025-0002', 'BSIT-1', 'tine@email.com', 'tine', '082507', 'student'),
+('Chelsie Chavez', '2025-0003', 'BSIT-1', 'chels@email.com', 'chels', '12345678', 'student'),
+('Aldrich Hilamon', '2025-0004', 'BSIT-1', 'babygirl@email.com', 'babygirl', '12345678', 'student'),
+('Carlo Dingle', '2025-1055147', 'BSIT-1', 'carlo@email.com', 'cymric', 'locardingle', 'student');
 UNLOCK TABLES;
-/*!40000 ALTER TABLE `users` ENABLE KEYS */;
-
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2026-01-26 21:52:53

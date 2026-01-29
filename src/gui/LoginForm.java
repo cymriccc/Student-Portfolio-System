@@ -102,36 +102,42 @@ public class LoginForm extends JFrame {
     private void login() {
         String user = txtUsername.getText();
         String pass = new String(txtPassword.getPassword());
-        
+
+        String sql = "SELECT role, full_name, course_year FROM users WHERE username = ? AND password = ?";
+
         // Database verification
         try (Connection conn = Database.getConnection()) {
-            String sql = "SELECT full_name, course_year FROM users WHERE username=? AND password=?";
             PreparedStatement pst = conn.prepareStatement(sql);
             pst.setString(1, user);
             pst.setString(2, pass);
-
-            // Execute query
+  
             ResultSet rs = pst.executeQuery();
+            
             if (rs.next()) {
+                String role = rs.getString("role");
                 String name = rs.getString("full_name");
                 String course = rs.getString("course_year");
                 String actualUsername = user;
                 
                 CustomDialog.show(this, "✓ Welcome, " + name + "!", true);
 
-                
-
-                // Launch the Dashboard System
-                myFrame dashboardFrame = new myFrame();
-                new MainContent(dashboardFrame, name, course, actualUsername);
-                new Menu(dashboardFrame);
-                new frameDisplay(dashboardFrame);
-                this.dispose();
+                if ("admin".equalsIgnoreCase(role)) {
+                    // Open Admin Dashboard
+                    new AdminDashboard().setVisible(true);
+                } else {
+                    // Open standard Student Dashboard system
+                    myFrame dashboardFrame = new myFrame();
+                    new MainContent(dashboardFrame, name, course, actualUsername);
+                    new Menu(dashboardFrame);
+                    new frameDisplay(dashboardFrame);
+                }
+                this.dispose(); // Close login window
             } else {
                 CustomDialog.show(this, "✕ Invalid credentials!", false);
             }
         } catch (Exception e) {
             e.printStackTrace();
+            CustomDialog.show(this, "Database Error: " + e.getMessage(), false);
         }
     }
 
