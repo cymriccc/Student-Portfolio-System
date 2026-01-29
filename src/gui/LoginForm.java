@@ -4,6 +4,7 @@ import db.Database;
 import java.awt.*;
 import java.sql.*;
 import javax.swing.*;
+import main.Main;
 
 public class LoginForm extends JFrame {
     private JTextField txtUsername;
@@ -16,7 +17,7 @@ public class LoginForm extends JFrame {
         setLocationRelativeTo(null);
         setLayout(null);
         setUndecorated(true);
-        getContentPane().setBackground(new Color(0x839788));
+        getContentPane().setBackground(Main.BG_COLOR);
 
         int centerX = 100;
         int fieldWidth = 400;
