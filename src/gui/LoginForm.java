@@ -117,7 +117,7 @@ public class LoginForm extends JFrame {
                 String course = rs.getString("course_year");
                 String actualUsername = user;
                 
-                CustomDialog.show(this, "Welcome, " + name + "!");
+                CustomDialog.show(this, "✓ Welcome, " + name + "!", true);
 
                 
 
@@ -128,7 +128,7 @@ public class LoginForm extends JFrame {
                 new frameDisplay(dashboardFrame);
                 this.dispose();
             } else {
-                CustomDialog.show(this, "Invalid credentials!");
+                CustomDialog.show(this, "✕ Invalid credentials!", false);
             }
         } catch (Exception e) {
             e.printStackTrace();

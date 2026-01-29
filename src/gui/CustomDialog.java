@@ -2,9 +2,10 @@ package gui;
 
 import java.awt.*;
 import javax.swing.*;
+import main.Main;
 
 public class CustomDialog extends JDialog {
-    public CustomDialog(JFrame parent, String message) {
+    public CustomDialog(JFrame parent, String message, Color themeColor) {
         super(parent, true); // Modal: blocks interaction with the main window
         setUndecorated(true);
         setSize(400, 200);
@@ -13,23 +14,24 @@ public class CustomDialog extends JDialog {
         // Main Panel
         JPanel panel = new JPanel();
         panel.setLayout(null);
-        panel.setBackground(new Color(0x839788)); // Sage Green
-        panel.setBorder(BorderFactory.createLineBorder(new Color(0xf5e4d7), 2)); // Cream Border
+        panel.setBackground(Main.BG_COLOR);
+
+        panel.setBorder(BorderFactory.createLineBorder(themeColor, 2));
         add(panel);
 
         // Message Text
         JLabel lblMessage = new JLabel("<html><div style='text-align: center;'>" + message + "</div></html>");
         lblMessage.setBounds(20, 40, 360, 60);
         lblMessage.setFont(new Font("Helvetica", Font.PLAIN, 18));
-        lblMessage.setForeground(new Color(0xf5e4d7)); // Cream
+        lblMessage.setForeground(Main.TEXT_COLOR);
         lblMessage.setHorizontalAlignment(SwingConstants.CENTER);
         panel.add(lblMessage);
 
-        // Styled "OK" Button
+        // Button color changes to match theme
         JButton btnOk = new JButton("GOT IT");
         btnOk.setBounds(150, 130, 100, 40);
-        btnOk.setBackground(new Color(0x73877b)); // Darker Sage
-        btnOk.setForeground(new Color(0xf5e4d7));
+        btnOk.setBackground(themeColor);
+        btnOk.setForeground(Color.WHITE);
         btnOk.setFont(new Font("Helvetica", Font.BOLD, 14));
         btnOk.setFocusPainted(false);
         btnOk.setBorderPainted(false);
@@ -40,10 +42,10 @@ public class CustomDialog extends JDialog {
         // Hover Effect
         btnOk.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent e) {
-                btnOk.setBackground(new Color(0x94a899));
+                btnOk.setBackground(themeColor.brighter());
             }
             public void mouseExited(java.awt.event.MouseEvent e) {
-                btnOk.setBackground(new Color(0x73877b));
+                btnOk.setBackground(themeColor);
             }
         });
 
@@ -51,7 +53,9 @@ public class CustomDialog extends JDialog {
     }
 
     // Static helper method to call it easily
-    public static void show(JFrame parent, String message) {
-        new CustomDialog(parent, message).setVisible(true);
+    public static void show(JFrame parent, String message, boolean isSuccess) {
+        Color themeColor = isSuccess ? Main.ACCENT_COLOR : new Color(0xE74C3C); // Red for errors
+
+        new CustomDialog(parent, message, themeColor).setVisible(true);
     }
 }

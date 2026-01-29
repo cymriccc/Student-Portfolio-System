@@ -122,32 +122,32 @@ public class Register extends JFrame {
 
         // Check for empty fields
         if (fullName.isEmpty() || studentID.isEmpty() || courseYear.isEmpty() || email.isEmpty() || user.isEmpty() || pass.isEmpty()) {
-            CustomDialog.show(this, "Please fill in all required fields!");
+            CustomDialog.show(this, "✕ Please fill in all required fields!", false);
             return;
         }
 
         // No spaces allowed in username, password, student ID
         if (user.contains(" ") || pass.contains(" ") || studentID.contains(" ")) {
-            CustomDialog.show(this, "Username, Password, and Student ID cannot contain spaces!");
+            CustomDialog.show(this, "✕ Username, Password, and Student ID cannot contain spaces!", false);
             return;
         }
 
         // Strong Email Validation (Regex)
         // Ensures format like: something@domain.com
         if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-            CustomDialog.show(this, "Please enter a valid professional email address!");
+            CustomDialog.show(this, "✕ Please enter a valid professional email address!", false);
             return;
         }
 
         // Student ID Validation (Only numbers and dashes)
         if (!studentID.matches("[0-9-]+")) {
-        CustomDialog.show(this, "Student ID should only contain numbers and dashes!");
+        CustomDialog.show(this, "✕ Student ID should only contain numbers and dashes!", false);
         return;
         }
 
         // Password Strength (Minimum 8 characters)
         if (pass.length() < 8) {
-            CustomDialog.show(this, "Password must be at least 8 characters long!");
+            CustomDialog.show(this, "✕ Password must be at least 8 characters long!", false);
             return;
         }
 
@@ -162,13 +162,13 @@ public class Register extends JFrame {
             pst.setString(6, pass);
 
             pst.executeUpdate();
-            CustomDialog.show(this, "Registration Successful!");
+            CustomDialog.show(this, "✓ Registration Successful!", true);
             new LoginForm().setVisible(true);
             dispose();
 
         } catch (Exception ex) {
             ex.printStackTrace();
-            CustomDialog.show(this, "Error: " + ex.getMessage());
+            CustomDialog.show(this, "✕ Error: " + ex.getMessage(), false);
         }
     }
 
