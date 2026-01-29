@@ -27,9 +27,10 @@ CREATE TABLE `users` (
   `full_name` varchar(100) NOT NULL,
   `student_id` varchar(50) DEFAULT NULL,
   `course_year` varchar(100) DEFAULT NULL,
-  `email` varchar(100) DEFAULT NULL
+  `email` varchar(100) DEFAULT NULL,
   `username` varchar(50) NOT NULL,
   `password` varchar(100) NOT NULL,
+  'role' varchar(20) DEFAULT 'student',
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -40,10 +41,16 @@ CREATE TABLE `users` (
 --
 
 LOCK TABLES `users` WRITE;
-/*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` (`id`, `full_name`, `username`, `password`) VALUES (1,'Administrator','admin','admin123'),(2,'Jhulzen Guerrero','jhulzen','102806'),(3,'Kristine Borres','tine','12345'),(4,'Chelsie Chavez','chels','1234'),(5,'Aldrich Hilamon','babygirl','1234');
-/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+INSERT INTO `users` (`full_name`, `student_id`, `course_year`, `email`, `username`, `password`, `role`) VALUES 
+('Administrator', '0000-0000', 'N/A', 'admin@nu-baliwag.edu.ph', 'admin', 'admin123', 'admin'),
+('Jhulzen Guerrero', '2025-0001', 'BSIT-1', 'jhulzen@email.com', 'jhulzen', '102806', 'student'),
+('Kristine Borres', '2025-0002', 'BSIT-1', 'tine@email.com', 'tine', '12345', 'student'),
+('Chelsie Chavez', '2025-0003', 'BSIT-1', 'chels@email.com', 'chels', '1234', 'student'),
+('Aldrich Hilamon', '2025-0004', 'BSIT-1', 'babygirl@email.com', 'babygirl', '1234', 'student'),
+('Carlo Dingle', '2025-1055147', 'BSIT-1', 'carlo@email.com', 'carlo', '123456', 'student');
 UNLOCK TABLES;
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
