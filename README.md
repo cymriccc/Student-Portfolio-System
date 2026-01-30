@@ -52,7 +52,7 @@ git clone https://github.com/cymriccc/Student-Portfolio-System.git
 
 * [ ] Portfolio template export (PDF/JSON)
 
-* [ ] Admin Login for managing database
+* [x] Admin Login for managing database
 
 ## ⚖️ License
 This project is licensed under the MIT License — see the LICENSE file for details.
