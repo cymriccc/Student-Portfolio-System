@@ -2,19 +2,14 @@ package gui;
 
 import db.Database;
 import java.awt.*;
-import java.io.File;
-import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import main.Main;
 
 public class PortfolioPanel extends JPanel {
-    private File selectedFile;
-    private JLabel lblFileName;
-    private JTextField txtProjectName;
-    private JButton btnChoose, btnUpload;
+    private JPanel galleryContainer;
 
     public PortfolioPanel() {
         // MATCHING DASHBOARD COLOR
@@ -27,77 +22,146 @@ public class PortfolioPanel extends JPanel {
         title.setForeground(new Color(0x2D3436));
         add(title);
 
-        JLabel lblName = new JLabel("Project Name:");
-        lblName.setBounds(50, 100, 150, 20);
-        lblName.setFont(new Font("Helvetica", Font.BOLD, 14));
-        add(lblName);
+        // --- Add Button ---
+        JButton btnOpenPopup = new JButton("+ ADD PROJECT");
+        btnOpenPopup.setBounds(700, 30, 180, 40);
+        btnOpenPopup.setBackground(Main.ACCENT_COLOR); // 0x575FCF
+        btnOpenPopup.setForeground(Color.WHITE);
+        btnOpenPopup.setFont(new Font("Helvetica", Font.BOLD, 14));
+        btnOpenPopup.setFocusPainted(false);
+        btnOpenPopup.setBorderPainted(false);
+        btnOpenPopup.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        txtProjectName = new JTextField();
-        txtProjectName.setBounds(50, 130, 400, 35);
-       txtProjectName.setBorder(BorderFactory.createLineBorder(new Color(0xD1D8E0)));
-        add(txtProjectName);
-
-        // 2. File Selection Area
-        btnChoose = new JButton("CHOOSE FILE");
-        btnChoose.setBounds(50, 190, 150, 40);
-        btnChoose.setBackground(new Color(0x2D3436)); // Slate
-        btnChoose.setForeground(Color.WHITE);
-        btnChoose.setFocusPainted(false);
-        btnChoose.addActionListener(e -> chooseFile());
-        add(btnChoose);
-
-        // This is the label that had the red line error
-        lblFileName = new JLabel("No file selected");
-        lblFileName.setBounds(220, 200, 300, 20);
-        lblFileName.setForeground(new Color(0x636E72));
-        add(lblFileName);
-
-        // 3. Upload Button (Accent Color)
-        btnUpload = new JButton("UPLOAD TO PORTFOLIO");
-        btnUpload.setBounds(50, 260, 400, 45);
-        btnUpload.setBackground(Main.ACCENT_COLOR); // Your Indigo 0x575FCF
-        btnUpload.setForeground(Color.WHITE);
-        btnUpload.setFont(new Font("Helvetica", Font.BOLD, 14));
-        btnUpload.addActionListener(e -> {
-            // Add logic to get current user ID here
-            uploadToDatabase(1, txtProjectName.getText()); 
+        btnOpenPopup.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                btnOpenPopup.setBackground(Main.ACCENT_COLOR.brighter());
+            }
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                btnOpenPopup.setBackground(Main.ACCENT_COLOR);
+            }
         });
-        add(btnUpload);
+
+        btnOpenPopup.addActionListener(e -> showAddPortfolioPopup());
+        add(btnOpenPopup);
+
+        // --- Gallery Scroll Area ---
+        galleryContainer = new JPanel();
+        galleryContainer.setLayout(new FlowLayout(FlowLayout.LEFT, 25, 25));
+        galleryContainer.setBackground(Main.BG_COLOR);
+
+        JScrollPane scrollPane = new JScrollPane(galleryContainer);
+        scrollPane.setBounds(50, 100, 850, 500);
+        scrollPane.setBorder(null); // Clean Ice Look
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        add(scrollPane);
+
+        loadProjects(); // Initial load from MySQL
     }
 
-    private void chooseFile() {
-        JFileChooser fileChooser = new JFileChooser();
-    
-        // Filter for images/PDFs
-        FileNameExtensionFilter filter = new FileNameExtensionFilter(
-            "Images & PDFs", "jpg", "png", "pdf");
-       fileChooser.setFileFilter(filter);
-
-        int result = fileChooser.showOpenDialog(this);
-        if (result == JFileChooser.APPROVE_OPTION) {
-           selectedFile = fileChooser.getSelectedFile();
-            lblFileName.setText("Selected: " + selectedFile.getName());
-        }
+    private void showAddPortfolioPopup() {
+        // We pass 'this' so the popup can call loadProjects() when done
+        AddPortfolioPopup popup = new AddPortfolioPopup((Frame) SwingUtilities.getWindowAncestor(this), this);
+        popup.setVisible(true);
     }
 
-    private void uploadToDatabase(int currentUserId, String projectName) {
-        String sql = "INSERT INTO portfolios (user_id, project_name, file_data, file_name) VALUES (?, ?, ?, ?)";
-    
+    public void loadProjects() {
+        galleryContainer.removeAll();
+        // Fetching ID, Name, and the actual Image data
+        String sql = "SELECT id, project_name, file_data FROM portfolios";
+
         try (Connection conn = Database.getConnection();
              PreparedStatement pst = conn.prepareStatement(sql);
-             FileInputStream fis = new FileInputStream(selectedFile)) {
-        
-            pst.setInt(1, currentUserId);
-            pst.setString(2, projectName);
-            pst.setBinaryStream(3, fis, (int) selectedFile.length()); // The binary data
-            pst.setString(4, selectedFile.getName());
-                
-            pst.executeUpdate();
-            CustomDialog.show(this, "Project Uploaded Successfully!", true);
-                
-       } catch (Exception e) {
+             ResultSet rs = pst.executeQuery()) {
+
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("project_name");
+                byte[] imgBytes = rs.getBytes("file_data");
+            
+                // Create the card with the actual image
+                galleryContainer.add(createProjectCard(id, name, imgBytes));
+            }
+        } catch (Exception e) {
             e.printStackTrace();
-            CustomDialog.show(this, "Upload Failed!", false);
+        }
+        galleryContainer.revalidate();
+        galleryContainer.repaint();
+    }
+
+    private JPanel createProjectCard(int id, String name, byte[] imgBytes) {
+        JPanel card = new JPanel();
+        card.setPreferredSize(new Dimension(240, 220));
+        card.setBackground(Color.WHITE);
+        card.setLayout(new BorderLayout());
+        card.setBorder(BorderFactory.createLineBorder(new Color(0xD1D8E0), 1));
+
+        // --- 1. Image Preview ---
+        JLabel imgLabel = new JLabel("", SwingConstants.CENTER);
+        if (imgBytes != null) {
+            ImageIcon icon = new ImageIcon(imgBytes);
+            // Scale image to fit the card (240x140)
+            Image scaled = icon.getImage().getScaledInstance(240, 140, Image.SCALE_SMOOTH);
+            imgLabel.setIcon(new ImageIcon(scaled));
+        } else {
+            imgLabel.setText("No Preview");
+        }
+        card.add(imgLabel, BorderLayout.CENTER);
+
+        // --- 2. Bottom Info Panel ---
+        JPanel infoPanel = new JPanel(new BorderLayout());
+        infoPanel.setBackground(Color.WHITE);
+    
+        JLabel lblName = new JLabel(" " + name);
+        lblName.setFont(new Font("Helvetica", Font.BOLD, 14));
+    
+        // --- 3. Delete Button ---
+        JButton btnDelete = new JButton("🗑");
+        btnDelete.setForeground(Color.RED);
+        btnDelete.setBorderPainted(false);
+        btnDelete.setFocusPainted(false);
+        btnDelete.setContentAreaFilled(false);
+        btnDelete.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        btnDelete.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                btnDelete.setForeground(new Color(0xC0392B)); // Darker Red
+            }
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                btnDelete.setForeground(Color.RED); // Original Red
+            }
+        });
+
+        btnDelete.addActionListener(e -> deleteProject(id));
+
+        infoPanel.add(lblName, BorderLayout.CENTER);
+        infoPanel.add(btnDelete, BorderLayout.EAST);
+        card.add(infoPanel, BorderLayout.SOUTH);
+
+        return card;
+    }
+
+    private void deleteProject(int id) {
+        // Using your custom Styled Dialog for confirmation
+        boolean confirm = CustomDialog.showConfirm(this, "Are you sure you want to delete this project?");
+
+        if (confirm) {
+            String sql = "DELETE FROM portfolios WHERE id = ?";
+            try (Connection conn = Database.getConnection();
+                 PreparedStatement pst = conn.prepareStatement(sql)) {
+            
+                pst.setInt(1, id);
+                int rowsDeleted = pst.executeUpdate();
+            
+                if (rowsDeleted > 0) {
+                    // Success feedback using CustomDialog
+                    CustomDialog.show(this, "Project deleted successfully!", true);
+                    loadProjects(); // Refresh the gallery cards
+                }
+            
+            } catch (Exception e) {
+                e.printStackTrace();
+                CustomDialog.show(this, "Error deleting project.", false);
+            }
         }
     }
 }

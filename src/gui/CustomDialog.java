@@ -52,13 +52,14 @@ public class CustomDialog extends JDialog {
         panel.add(btnOk);
     }
 
-    public static boolean showConfirm(Frame parent, String message) {
-        // Create a modal dialog
-        final JDialog dialog = new JDialog(parent, true);
+    public static boolean showConfirm(Component parent, String message) {
+        Frame parentFrame = (parent instanceof Frame) ? (Frame)parent : (Frame)SwingUtilities.getWindowAncestor(parent);
+
+        final JDialog dialog = new JDialog(parentFrame, true);
         dialog.setUndecorated(true);
         dialog.setLayout(null);
         dialog.setSize(400, 200);
-        dialog.setLocationRelativeTo(parent);
+        dialog.setLocationRelativeTo(parentFrame);
         dialog.getContentPane().setBackground(Color.WHITE);
     
         // Border for the dialog
@@ -83,11 +84,23 @@ public class CustomDialog extends JDialog {
         btnYes.setBackground(new Color(0x575FCF));
         btnYes.setForeground(Color.WHITE);
         btnYes.setFocusPainted(false);
+        btnYes.setBorderPainted(false);
         btnYes.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        btnYes.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                btnYes.setBackground(new Color(0x6D75E3)); // Lighter Indigo
+            }
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                btnYes.setBackground(new Color(0x575FCF)); // Original Indigo
+            }
+        });
+
         btnYes.addActionListener(e -> {
             result[0] = true;
             dialog.dispose();
         });
+
         content.add(btnYes);
 
         // --- NO BUTTON (Slate/Light Grey) ---
@@ -96,7 +109,18 @@ public class CustomDialog extends JDialog {
         btnNo.setBackground(new Color(0xD1D8E0));
         btnNo.setForeground(new Color(0x2D3436));
         btnNo.setFocusPainted(false);
+        btnNo.setBorderPainted(false);
         btnNo.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        btnNo.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+               btnNo.setBackground(new Color(0xB2BEC3)); // Slightly darker grey
+            }
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                btnNo.setBackground(new Color(0xD1D8E0)); // Original Grey
+            }
+        });
+
         btnNo.addActionListener(e -> {
             result[0] = false;
             dialog.dispose();
