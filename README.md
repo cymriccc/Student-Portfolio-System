@@ -53,7 +53,9 @@ git clone https://github.com/cymriccc/Student-Portfolio-System.git
 - [x] Build Portfolio Upload Logic
 - [x] Admin Login for managing database
 - [x] Create Project Gallery View
-- [ ] Finalize Settings & Profile Page
+- [x] Finalize Settings & Profile Page
+- [ ] Add function to Dashboard Overview
+- [ ] Customize scroll bar and view image in discovery portfolio
 
 ## ⚖️ License
 This project is licensed under the MIT License — see the LICENSE file for details.
