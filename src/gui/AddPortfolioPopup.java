@@ -24,9 +24,13 @@ public class AddPortfolioPopup extends JDialog {
         
         setSize(500, 450);
         setLocationRelativeTo(owner);
-        setLayout(null);
         setUndecorated(true);
-        getContentPane().setBackground(Color.WHITE);
+        
+        JPanel rootPanel = new JPanel();
+        rootPanel.setLayout(null);
+        rootPanel.setBackground(Color.WHITE);
+        rootPanel.setBorder(BorderFactory.createLineBorder(Main.ACCENT_COLOR, 2)); 
+        this.setContentPane(rootPanel);
 
         JLabel title = new JLabel("Upload New Project");
         title.setBounds(30, 20, 300, 30);
@@ -112,14 +116,16 @@ public class AddPortfolioPopup extends JDialog {
              PreparedStatement pst = conn.prepareStatement(sql);
              FileInputStream fis = new FileInputStream(selectedFile)) {
             
-            pst.setInt(1, 1); // Replace with real user ID
+            pst.setInt(1, this.currentUserId); // Replace with real user ID
             pst.setString(2, txtProjectName.getText());
             pst.setBinaryStream(3, fis, (int) selectedFile.length());
             pst.setString(4, selectedFile.getName());
             
             pst.executeUpdate();
             CustomDialog.show(this, "Uploaded!", true);
-            parentPanel.loadProjects(currentUserId); // Refresh the gallery automatically!
+
+            // Refresh parent gallery
+            if(parentPanel != null) parentPanel.loadProjects(currentUserId);
             dispose(); // Close the popup
         } catch (Exception e) {
             e.printStackTrace();

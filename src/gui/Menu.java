@@ -69,12 +69,22 @@ public class Menu {
         profileBtn.setForeground(new Color(0xECF0F1));
         profileBtn.setFont(new Font("Helvetica", Font.BOLD, 16));
         profileBtn.setHorizontalAlignment(SwingConstants.LEFT);
+        profileBtn.setMargin(new Insets(0, 50, 0, 0));
         profileBtn.setBorderPainted(false);
         profileBtn.setFocusPainted(false);
         profileBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        
+
         // Navigation Logic
-        profileBtn.addActionListener(e -> frameObject.getCardLayout().show(frameObject.getContainer(), "PROFILE"));
+        profileBtn.addActionListener(e -> {
+            frameObject.getCardLayout().show(frameObject.getContainer(), "PROFILE");
+    
+            // 1. Wipe the indigo line and blue text from the Dashboard and other buttons
+            resetButtonStyles(menuPanel); 
+
+            // 2. (Optional) If you want the "My Profile" button to also get a line:
+            profileBtn.setBackground(new Color(0x575FCF)); 
+            profileBtn.setForeground(Color.WHITE);
+        });
         
         // Hover Logic for Profile Button
         profileBtn.addMouseListener(new MouseAdapter() {
@@ -82,8 +92,9 @@ public class Menu {
                 profileBtn.setBackground(Main.ACCENT_COLOR);
             }
             public void mouseExited(MouseEvent e) {
-                profileBtn.setBackground(new Color(0x252b2b));
-
+                if (!frameObject.getContainer().getComponent(0).isVisible()) { 
+                    profileBtn.setBackground(new Color(0x252b2b));
+                }
             }
         });
         bottomSection.add(profileBtn);
@@ -179,8 +190,10 @@ public class Menu {
     private void resetButtonStyles(JPanel menuPanel) {
         for (Component c : menuPanel.getComponents()) {
             if (c instanceof JButton) {
-                c.setForeground(new Color(0xD1D8E0));
-                ((JButton) c).setBorder(BorderFactory.createEmptyBorder(0, 40, 0, 0));
+                JButton btn = (JButton) c;
+                btn.setForeground(new Color(0xD1D8E0));
+                // This resets the border to a standard empty one for EVERY button
+                btn.setBorder(BorderFactory.createEmptyBorder(0, 40, 0, 0));
             }
         }
     }
