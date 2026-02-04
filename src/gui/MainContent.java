@@ -10,7 +10,8 @@ public class MainContent {
     public MainContent(myFrame frameObject, String studentName, String courseYear, String username, int userId) {
         JPanel container = frameObject.getContainer();
 
-        dashboard = new DashboardPanel(studentName, courseYear);
+        dashboard = new DashboardPanel(userId, studentName, courseYear);
+        
 
         container.add(dashboard, "DASHBOARD");
         container.add(new PortfolioPanel(userId), "PORTFOLIO");

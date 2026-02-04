@@ -135,31 +135,35 @@ public class ProfilePanel extends JPanel {
     }
     
     private void saveProfileChanges(myFrame frameObject) {
-        String newName = nameField.getText();
-        String newCourse = courseField.getText();
+    String newName = nameField.getText();
+    String newCourse = courseField.getText();
 
-        try (Connection conn = Database.getConnection()) {
-            String sql = "UPDATE users SET full_name=?, student_id=?, course_year=?, email=?, bio=? WHERE username=?";
-            PreparedStatement pst = conn.prepareStatement(sql);
-            pst.setString(1, newName);
-            pst.setString(2, idField.getText());
-            pst.setString(3, newCourse);
-            pst.setString(4, emailField.getText());
-            pst.setString(5, bioArea.getText());
-            pst.setString(6, currentUsername);
+    try (Connection conn = Database.getConnection()) {
+        String sql = "UPDATE users SET full_name=?, student_id=?, course_year=?, email=?, bio=? WHERE username=?";
+        PreparedStatement pst = conn.prepareStatement(sql);
+        pst.setString(1, newName);
+        pst.setString(2, idField.getText());
+        pst.setString(3, newCourse);
+        pst.setString(4, emailField.getText());
+        pst.setString(5, bioArea.getText());
+        pst.setString(6, currentUsername);
 
-            int updated = pst.executeUpdate();
-            if (updated > 0) {
-                dashRef.refreshDashboardInfo(newName, newCourse);
-                if (!selectedImagePath.isEmpty()) {
-                    updateSidebarImage(frameObject, selectedImagePath);
-                }
-                CustomDialog.show(frameObject.getFrame(), "Student Profile Synced!", true);
+        int updated = pst.executeUpdate();
+        if (updated > 0) {
+            
+            if (dashRef != null) {
+                dashRef.refreshData(); 
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            CustomDialog.show(frameObject.getFrame(), "Error saving profile.", false);
+
+            if (!selectedImagePath.isEmpty()) {
+                updateSidebarImage(frameObject, selectedImagePath);
+            }
+            CustomDialog.show(frameObject.getFrame(), "Student Profile Synced!", true);
         }
+    } catch (Exception e) {
+        e.printStackTrace();
+        CustomDialog.show(frameObject.getFrame(), "Error saving profile.", false);
+    }
     }
 
     private void setupImageUI(myFrame frameObject) {

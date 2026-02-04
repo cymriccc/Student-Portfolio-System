@@ -75,7 +75,6 @@ public class PasswordRecovery extends JDialog {
         btnVerify.addActionListener(e -> handleVerification());
     }
 
-    // Helper to create that consistent "Login Tab" look with padding
     private JTextField createStyledField() {
         JTextField field = new JTextField();
         field.setBackground(Color.WHITE);
