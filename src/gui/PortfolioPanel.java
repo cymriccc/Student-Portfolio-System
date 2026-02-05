@@ -76,7 +76,7 @@ public class PortfolioPanel extends JPanel {
         galleryContainer.removeAll();
         // Fetching ID, Name, and the actual Image data
         System.out.println("DEBUG: Fetching projects for User ID: " + currentUserId);
-        String sql = "SELECT id, project_name, description, upload_date, file_data FROM portfolios WHERE user_id = ?";
+        String sql = "SELECT id, project_name, description, upload_date, file_data, file_name FROM portfolios WHERE user_id = ?";
 
         try (Connection conn = Database.getConnection();
             PreparedStatement pst = conn.prepareStatement(sql)) {
@@ -87,15 +87,22 @@ public class PortfolioPanel extends JPanel {
             while (rs.next()) {
                 int id = rs.getInt("id");
                 String name = rs.getString("project_name");
+                String fileName = rs.getString("file_name");
                 byte[] imgBytes = rs.getBytes("file_data");
             
                 if (imgBytes != null && imgBytes.length > 0) {
-                    System.out.println("DEBUG: Image found. Size: " + imgBytes.length + " bytes.");
-                    galleryContainer.add(createProjectCard(id, name, imgBytes));
+                    System.out.println("DEBUG: File found for: " + name);
+                    if (fileName != null && fileName.toLowerCase().endsWith(".pdf")) {
+                        // Pass a special flag or a "PDF" byte array to your card creator
+                        galleryContainer.add(createProjectCard(id, name, imgBytes, true)); 
+                    } else {
+                        // It's a regular image
+                        galleryContainer.add(createProjectCard(id, name, imgBytes, false));
+                    }
                 } else {
                     System.out.println("DEBUG: Image data is NULL or EMPTY for project: " + name);
                     // Add a placeholder if the image is missing
-                   galleryContainer.add(createProjectCard(id, name, null)); 
+                   galleryContainer.add(createProjectCard(id, name, null,false)); 
                 }
             }
         } catch (Exception e) {
@@ -106,35 +113,44 @@ public class PortfolioPanel extends JPanel {
         galleryContainer.repaint();
     }
 
-    private JPanel createProjectCard(int id, String name, byte[] imgBytes) {
+    private JPanel createProjectCard(int id, String name, byte[] imgBytes, boolean isPdf) {
         JPanel card = new JPanel(new BorderLayout());
         card.setPreferredSize(new Dimension(240, 220));
         card.setBackground(Color.WHITE);
         card.setBorder(BorderFactory.createLineBorder(new Color(0xD1D8E0), 1));
 
-        // --- 1. Image Preview ---
+        // --- 1. UNIFIED PREVIEW (Image or PDF) ---
         JLabel imgLabel = new JLabel("", SwingConstants.CENTER);
-        imgLabel.setPreferredSize(new Dimension (240, 140));
+        imgLabel.setPreferredSize(new Dimension(240, 140));
 
-        if (imgBytes != null && imgBytes.length > 0) {
+        if (isPdf) {
+            // 1. If it's a PDF, we use the icon and STOP here
             try {
-                // Convert bytes to ImageIcon
+                ImageIcon pdfIcon = new ImageIcon("pdf_icon.png");
+                Image scaled = pdfIcon.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
+                imgLabel.setIcon(new ImageIcon(scaled));
+            } catch (Exception e) {
+                imgLabel.setText("PDF"); // Fallback if icon file is missing
+            }
+        } 
+        else if (imgBytes != null && imgBytes.length > 0) {
+            // 2. If it's NOT a PDF, try to render the actual image bytes
+            try {
                 ImageIcon icon = new ImageIcon(imgBytes);
-            
-                // Check if icon actually loaded pixels
                 if (icon.getImageLoadStatus() == MediaTracker.COMPLETE) {
                     Image img = icon.getImage();
-                    // Smooth scaling is heavy; make sure dimensions match your label
                     Image scaled = img.getScaledInstance(240, 140, Image.SCALE_SMOOTH);
                     imgLabel.setIcon(new ImageIcon(scaled));
-                } else {
-                    imgLabel.setText("Corrupted Image");
+               } else {
+                    // This is what was showing up for your PDF before!
+                    imgLabel.setText("Corrupted Image"); 
                 }
             } catch (Exception e) {
-                System.out.println("Error rendering image for " + name + ": " + e.getMessage());
-                imgLabel.setText("Error");
+               imgLabel.setText("Error");
             }
-        } else {
+        } 
+        else {
+            // 3. No data at all
             imgLabel.setText("No Preview");
             imgLabel.setForeground(Color.GRAY);
         }
