@@ -30,10 +30,18 @@ public class Menu {
         // --- TITLE LABEL ---
         JLabel titleLabel = new JLabel("Portfolio Management");
         titleLabel.setBounds(0, 180, 350, 40);
-        titleLabel.setFont(new Font("Helvetica", Font.BOLD, 22));
+        titleLabel.setFont(new Font("Helvetica", Font.BOLD, 18));
         titleLabel.setForeground(Color.WHITE);
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         menuPanel.add(titleLabel);
+
+        // --- SUBTITLE LABEL ---
+        JLabel subtitleLabel = new JLabel("BY VANTAGE");
+        subtitleLabel.setBounds(0, 210, 350, 20);
+        subtitleLabel.setFont(new Font("Helvetica", Font.PLAIN, 12));
+        subtitleLabel.setForeground(new Color(0xBDC3C7));
+        subtitleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        menuPanel.add(subtitleLabel);
 
         // --- NAVIGATION BUTTONS ---
         // 1. Create the buttons and store them in variables

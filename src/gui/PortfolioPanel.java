@@ -49,12 +49,23 @@ public class PortfolioPanel extends JPanel {
 
         // --- Gallery Scroll Area ---
         galleryContainer = new JPanel();
-        galleryContainer.setLayout(new FlowLayout(FlowLayout.LEFT, 25, 25));
+        galleryContainer.setLayout(new GridLayout(0,3,25,25));
         galleryContainer.setBackground(Main.BG_COLOR);
 
-        JScrollPane scrollPane = new JScrollPane(galleryContainer);
-        scrollPane.setBounds(50, 100, 850, 500);
-        scrollPane.setBorder(null); // Clean Ice Look
+        JPanel wrapper = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        wrapper.setBackground(Main.BG_COLOR);
+        wrapper.add(galleryContainer);
+
+        JScrollPane scrollPane = new JScrollPane(wrapper);
+        // Since your main panel uses null layout, you MUST use setBounds
+        scrollPane.setBounds(50, 100, 850, 500); 
+        scrollPane.setBorder(null); 
+        scrollPane.setBackground(Main.BG_COLOR);
+        scrollPane.getViewport().setBackground(Main.BG_COLOR); // Ensures "Ice" theme consistency
+
+        // FORCE scrollbar behavior so it only goes vertical
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         add(scrollPane);
 
